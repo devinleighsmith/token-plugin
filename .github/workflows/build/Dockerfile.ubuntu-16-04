@@ -1,0 +1,98 @@
+FROM hyperledger/indy-core-baseci:0.0.3-master
+LABEL maintainer="Hyperledger <hyperledger-indy@lists.hyperledger.org>"
+
+# rocksdb
+RUN apt-get update && apt-get install -y \
+    libbz2-dev \
+    zlib1g-dev \
+    liblz4-dev \
+    libsnappy-dev \
+    rocksdb=5.8.8 \
+    python3-nacl \
+    python3-pip \
+    libindy-crypto=0.4.5 \
+    libindy=1.13.0~1420 \
+    libsovtoken=1.0.2~92 \
+    # indy dependencies
+    indy-node \
+    indy-plenum \
+    ursa=0.3.2-2 \
+    software-properties-common \
+    # rocksdb python wrapper
+    rocksdb=5.8.8 \
+    && rm -rf /var/lib/apt/lists/*
+
+# pypi based packages
+RUN pip3 install -U \ 
+    Pygments==2.2.0 \
+    Pympler==0.8 \
+    apipkg==1.5 \
+    attrs==20.3.0 \
+    base58==2.1.0 \
+    distro==1.5.0 \
+    execnet==1.8.0 \
+    flake8==3.8.4 \
+    indy-plenum==1.13.0.dev1032 \
+    indy-node==1.13.0.dev1222 \
+    iniconfig==1.1.1 \
+    intervaltree==2.1.0 \
+    ioflo==1.7.7 \
+    jsonpickle==2.0.0 \
+    leveldb==0.201 \
+    libnacl==1.7.2 \
+    mccabe==0.6.1 \
+    msgpack-python==0.5.6 \
+    orderedset==2.0.3 \
+    packaging==20.9 \
+    pip==9.0.3 \
+    pluggy==0.13.1 \
+    portalocker==2.2.1 \
+    prompt-toolkit==2.0.10 \
+    psutil==5.6.6 \
+    py==1.10.0 \
+    pycodestyle==2.6.0 \
+    pyflakes==2.2.0 \
+    pyparsing==2.4.7 \
+    pytest==6.1.2 \
+    pytest-asyncio==0.14.0 \
+    pytest-forked==1.3.0 \
+    pytest-runner==5.2 \
+    pytest-xdist==2.2.1 \
+    python-dateutil==2.6.1 \
+    python-rocksdb==0.6.9 \
+    python-ursa==0.1.1 \
+    python3-indy==1.13.0 \
+    pyzmq==18.1.0 \
+    rlp==0.6.0 \
+    semver==2.13.0 \
+    setuptools==50.3.2 \
+    sha3==0.2.1 \
+    six==1.15.0 \
+    sortedcontainers==1.5.7 \
+    timeout-decorator==0.5.0 \
+    toml==0.10.2 \
+    ujson==1.33 \
+    wcwidth==0.2.5 \
+    wheel==0.34.2 \
+    zipp==1.2.0
+
+# install fpm
+ENV FPM_VERSION=1.9.3
+RUN apt-add-repository ppa:brightbox/ruby-ng \
+    && apt-get update && apt-get install -y --no-install-recommends \
+    ruby-childprocess=0.5.9-1ubuntu1 \
+    ruby2.6 \
+    ruby2.6-dev \
+    && gem install --no-document rake fpm:$FPM_VERSION \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /etc/indy && echo "ENABLED_PLUGINS = ['sovtoken', 'sovtokenfees']" > /etc/indy/indy_config.py \
+    && pip3 install -U \
+    pipenv \
+    setuptools==50.3.2 \
+    zipp==1.2.0 \
+    importlib_metadata==2.1.1 \
+    importlib_resources==3.2.1 \
+    python3-indy
+
+RUN indy_image_clean
