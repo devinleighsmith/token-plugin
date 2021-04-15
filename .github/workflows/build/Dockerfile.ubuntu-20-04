@@ -62,10 +62,10 @@ RUN mv /usr/lib/ursa/* /usr/lib && rm -rf /usr/lib/ursa
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 68DB5E88 \ 
     && add-apt-repository "deb https://repo.sovrin.org/deb xenial master" \
     && add-apt-repository "deb https://repo.sovrin.org/sdk/deb xenial master" \
+    && add-apt-repository "deb https://repo.sovrin.org/sdk/deb bionic master" \
     && add-apt-repository "deb http://archive.ubuntu.com/ubuntu xenial universe main" \
     && apt-get update -y && apt-get install -y \ 
-    libindy=1.13.0~1420 \
-    libsovtoken \
+    libindy=1.15.0~1625-bionic \
     libsodium23
 
 # pypi based packages
@@ -106,7 +106,7 @@ RUN pip3 install -U \
     python-dateutil==2.6.1 \
     python-rocksdb==0.7.0 \
     python-ursa==0.1.1 \
-    python3-indy==1.13.0 \
+    python3-indy==1.15.0-dev-1625 \
     pyzmq==18.1.0 \
     rlp==0.6.0 \
     semver==2.13.0 \
@@ -126,7 +126,8 @@ RUN pip3 install -U \
 
 COPY ./deps .
 RUN dpkg -i indy-plenum_9.9.9_amd64.deb \
-    && dpkg -i indy-node_9.9.9_amd64.deb
+    && dpkg -i indy-node_9.9.9_amd64.deb \
+    && dpkg -i libsovtoken_1.0.2_amd64.deb
 
 RUN mkdir -p /etc/indy && echo "ENABLED_PLUGINS = ['sovtoken', 'sovtokenfees']" > /etc/indy/indy_config.py
 
